@@ -110,7 +110,7 @@ func (r *Runtime) builtin_newArray(args []Value, proto *Object) *Object {
 func (r *Runtime) generic_push(obj *Object, call FunctionCall) Value {
 	l := toLength(obj.self.getStr("length", nil))
 	nl := l + int64(len(call.Arguments))
-	if nl >= maxInt {
+	if nl >= maxInt64 {
 		r.typeErrorResult(true, "Invalid array length")
 		panic("unreachable")
 	}
@@ -282,7 +282,7 @@ func (r *Runtime) arrayproto_concat_append(a *Object, item Value) {
 	aLength := toLength(a.self.getStr("length", nil))
 	if obj, ok := item.(*Object); ok && isConcatSpreadable(obj) {
 		length := toLength(obj.self.getStr("length", nil))
-		if aLength+length >= maxInt {
+		if aLength+length >= maxInt64 {
 			panic(r.NewTypeError("Invalid array length"))
 		}
 		for i := int64(0); i < length; i++ {
@@ -416,7 +416,7 @@ func (r *Runtime) arrayproto_splice(call FunctionCall) Value {
 	}
 	itemCount := max(int64(len(call.Arguments)-2), 0)
 	newLength := length - actualDeleteCount + itemCount
-	if newLength >= maxInt {
+	if newLength >= maxInt64 {
 		panic(r.NewTypeError("Invalid array length"))
 	}
 	a := arraySpeciesCreate(o, actualDeleteCount)
@@ -510,7 +510,7 @@ func (r *Runtime) arrayproto_unshift(call FunctionCall) Value {
 	newLen := intToValue(length + argCount)
 	if argCount > 0 {
 		newSize := length + argCount
-		if newSize >= maxInt {
+		if newSize >= maxInt64 {
 			panic(r.NewTypeError("Invalid array length"))
 		}
 		if arr := r.checkStdArrayObjWithProto(o); arr != nil && newSize < math.MaxUint32 {
@@ -1198,7 +1198,7 @@ func (r *Runtime) flattenIntoArray(target, source *Object, sourceLen, start, dep
 				elementLen := toLength(elementArray.self.getStr("length", nil))
 				targetIndex = r.flattenIntoArray(target, elementArray, elementLen, targetIndex, depth-1, nil, nil)
 			} else {
-				if targetIndex >= maxInt-1 {
+				if targetIndex >= maxInt64-1 {
 					panic(r.NewTypeError("Invalid array length"))
 				}
 				createDataPropertyOrThrow(target, intToValue(targetIndex), element)

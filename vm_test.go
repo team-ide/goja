@@ -1,11 +1,21 @@
 package goja
 
 import (
+	"fmt"
 	"github.com/dop251/goja/file"
 	"github.com/dop251/goja/parser"
 	"github.com/dop251/goja/unistring"
 	"testing"
 )
+
+func TestSum(t *testing.T) {
+	vm := New()
+	v, err := vm.RunString(" 4611686027042965191 + 11")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(v.Export())
+}
 
 func TestTaggedTemplateArgExport(t *testing.T) {
 	vm := New()

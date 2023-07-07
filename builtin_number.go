@@ -180,7 +180,7 @@ func (r *Runtime) number_isNaN(call FunctionCall) Value {
 
 func (r *Runtime) number_isSafeInteger(call FunctionCall) Value {
 	arg := call.Argument(0)
-	if i, ok := arg.(valueInt); ok && i >= -(maxInt-1) && i <= maxInt-1 {
+	if i, ok := arg.(valueInt); ok && i >= -(maxInt64-1) && i <= maxInt64-1 {
 		return valueTrue
 	}
 	if arg == _negativeZero {
@@ -206,8 +206,8 @@ func (r *Runtime) initNumber() {
 	o._putProp("isInteger", r.newNativeFunc(r.number_isInteger, nil, "isInteger", nil, 1), true, false, true)
 	o._putProp("isNaN", r.newNativeFunc(r.number_isNaN, nil, "isNaN", nil, 1), true, false, true)
 	o._putProp("isSafeInteger", r.newNativeFunc(r.number_isSafeInteger, nil, "isSafeInteger", nil, 1), true, false, true)
-	o._putProp("MAX_SAFE_INTEGER", valueInt(maxInt-1), false, false, false)
-	o._putProp("MIN_SAFE_INTEGER", valueInt(-(maxInt - 1)), false, false, false)
+	o._putProp("MAX_SAFE_INTEGER", valueInt(maxInt64), false, false, false)
+	o._putProp("MIN_SAFE_INTEGER", valueInt(minInt64), false, false, false)
 	o._putProp("MIN_VALUE", valueFloat(math.SmallestNonzeroFloat64), false, false, false)
 	o._putProp("MAX_VALUE", valueFloat(math.MaxFloat64), false, false, false)
 	o._putProp("NaN", _NaN, false, false, false)

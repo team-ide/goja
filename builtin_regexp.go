@@ -867,7 +867,7 @@ func (r *Runtime) regexpproto_stdSplitterGeneric(splitter *Object, s valueString
 	var a []Value
 	var lim int64
 	if limit == nil || limit == _undefined {
-		lim = maxInt - 1
+		lim = maxInt64 - 1
 	} else {
 		lim = toLength(limit)
 	}
