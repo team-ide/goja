@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/dop251/goja/unistring"
+	"github.com/team-ide/goja/unistring"
 )
 
 const (

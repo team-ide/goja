@@ -3,7 +3,7 @@ package goja
 import (
 	"math"
 
-	"github.com/dop251/goja/ftoa"
+	"github.com/team-ide/goja/ftoa"
 )
 
 func (r *Runtime) toNumber(v Value) Value {
