@@ -1172,8 +1172,8 @@ func toLength(v Value) int64 {
 	if i < 0 {
 		return 0
 	}
-	if i >= maxInt {
-		return maxInt - 1
+	if i >= maxInt64 {
+		return maxInt64 - 1
 	}
 	return i
 }
@@ -1240,7 +1240,7 @@ func toIntClamp(i int64) int {
 
 func (r *Runtime) toIndex(v Value) int {
 	num := v.ToInteger()
-	if num >= 0 && num < maxInt {
+	if num >= 0 && num < maxInt64 {
 		if bits.UintSize == 32 && num >= math.MaxInt32 {
 			panic(r.newError(r.getRangeError(), "Index %s overflows int", v.String()))
 		}
@@ -3083,7 +3083,7 @@ func strToIntNum(s unistring.String) (int, bool) {
 	if n == 0 {
 		return 0, ok
 	}
-	if ok && n >= -maxInt && n <= maxInt {
+	if ok && n >= minInt64 && n <= maxInt64 {
 		if bits.UintSize == 32 {
 			if n > math.MaxInt32 || n < math.MinInt32 {
 				return 0, false

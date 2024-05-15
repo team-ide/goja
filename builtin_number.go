@@ -187,7 +187,7 @@ func (r *Runtime) number_isNaN(call FunctionCall) Value {
 
 func (r *Runtime) number_isSafeInteger(call FunctionCall) Value {
 	arg := call.Argument(0)
-	if i, ok := arg.(valueInt); ok && i >= -(maxInt-1) && i <= maxInt-1 {
+	if i, ok := arg.(valueInt); ok && i >= -(maxInt64-1) && i <= maxInt64-1 {
 		return valueTrue
 	}
 	if arg == _negativeZero {

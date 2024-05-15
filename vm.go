@@ -13,7 +13,9 @@ import (
 )
 
 const (
-	maxInt = 1 << 53
+	minInt64 = -9223372036854775808
+	maxInt64 = 9223372036854775807
+	maxInt   = 1 << 53
 
 	tryPanicMarker = -2
 )
@@ -343,14 +345,14 @@ func intToValue(i int64) Value {
 	if idx := 256 + i; idx >= 0 && idx < 256 {
 		return intCache[idx]
 	}
-	if i >= -maxInt && i <= maxInt {
+	if i >= minInt64 && i <= maxInt64 {
 		return valueInt(i)
 	}
 	return valueFloat(i)
 }
 
 func floatToInt(f float64) (result int64, ok bool) {
-	if (f != 0 || !math.Signbit(f)) && !math.IsInf(f, 0) && f == math.Trunc(f) && f >= -maxInt && f <= maxInt {
+	if (f != 0 || !math.Signbit(f)) && !math.IsInf(f, 0) && f == math.Trunc(f) && f >= minInt64 && f <= maxInt64 {
 		return int64(f), true
 	}
 	return 0, false
