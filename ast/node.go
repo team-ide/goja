@@ -48,6 +48,8 @@ type (
 	Binding struct {
 		Target      BindingTarget
 		Initializer Expression
+		Type        []*Identifier
+		IsList      bool
 	}
 
 	Pattern interface {

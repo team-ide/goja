@@ -312,6 +312,33 @@ func (self *_parser) parseVariableDeclaration(declarationList *[]*ast.Binding) *
 		*declarationList = append(*declarationList, node)
 	}
 
+	//fmt.Println("parseVariableDeclaration node Target", node.Target)
+	//fmt.Println("parseVariableDeclaration self token", self.token)
+
+	var vatType []*ast.Identifier
+	for {
+		if self.token == token.LEFT_BRACKET {
+			self.next()
+			if self.token == token.RIGHT_BRACKET {
+				node.IsList = true
+				self.next()
+				continue
+			} else {
+				break
+			}
+		}
+		if self.token == token.IDENTIFIER {
+			t := self.parseIdentifier()
+			vatType = append(vatType, t)
+			if self.token == token.PERIOD {
+				self.next()
+				continue
+			}
+		}
+		break
+		//fmt.Println("parseVariableDeclaration node type", node.Target)
+	}
+	node.Type = vatType
 	if self.token == token.ASSIGN {
 		self.next()
 		node.Initializer = self.parseAssignmentExpression()

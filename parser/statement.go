@@ -42,6 +42,7 @@ func (self *_parser) parseStatement() ast.Statement {
 		return &ast.BadStatement{From: self.idx, To: self.idx + 1}
 	}
 
+	//fmt.Println("parseStatement:",self.token)
 	switch self.token {
 	case token.SEMICOLON:
 		return self.parseEmptyStatement()
