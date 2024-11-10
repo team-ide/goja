@@ -264,6 +264,28 @@ Second line \
 			token.NUMBER, "12.3", 5,
 		)
 
+		test("1_000 1_000_000",
+			token.NUMBER, "1_000", 1,
+			token.NUMBER, "1_000_000", 7,
+		)
+
+		test(`1n`,
+			token.NUMBER, "1n", 1,
+		)
+
+		test(`1n 9007199254740991n`,
+			token.NUMBER, "1n", 1,
+			token.NUMBER, "9007199254740991n", 4,
+		)
+
+		test(`0xabn`,
+			token.NUMBER, "0xabn", 1,
+		)
+
+		test(`0xabcdef0123456789abcdef0123n`,
+			token.NUMBER, "0xabcdef0123456789abcdef0123n", 1,
+		)
+
 		test("/ /=",
 			token.SLASH, "", 1,
 			token.QUOTIENT_ASSIGN, "", 3,

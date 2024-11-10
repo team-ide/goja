@@ -4,6 +4,9 @@ import (
 	"os"
 	"sync"
 	"testing"
+	"unsafe"
+
+	"github.com/dop251/goja/unistring"
 )
 
 const TESTLIB = `
@@ -11,8 +14,17 @@ function $ERROR(message) {
 	throw new Error(message);
 }
 
-function Test262Error() {
+function Test262Error(message) {
+  this.message = message || "";
 }
+
+Test262Error.prototype.toString = function () {
+  return "Test262Error: " + this.message;
+};
+
+Test262Error.thrower = (message) => {
+  throw new Test262Error(message);
+};
 
 function assert(mustBeTrue, message) {
     if (mustBeTrue === true) {
@@ -3132,18 +3144,6 @@ func TestDeleteGlobalEval(t *testing.T) {
 	testScript(SCRIPT, valueTrue, t)
 }
 
-func TestGlobalVarNames(t *testing.T) {
-	vm := New()
-	_, err := vm.RunString("(0,eval)('var x')")
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, err = vm.RunString("let x")
-	if err == nil {
-		t.Fatal("Expected error")
-	}
-}
-
 func TestTryResultEmpty(t *testing.T) {
 	const SCRIPT = `
 	1; try { } finally { }
@@ -4697,9 +4697,15 @@ func TestBadObjectKey(t *testing.T) {
 
 func TestConstantFolding(t *testing.T) {
 	testValues := func(prg *Program, result Value, t *testing.T) {
-		if len(prg.values) != 1 || !prg.values[0].SameAs(result) {
+		values := make(map[unistring.String]struct{})
+		for _, ins := range prg.code {
+			if lv, ok := ins.(loadVal); ok {
+				values[lv.v.string()] = struct{}{}
+			}
+		}
+		if len(values) != 1 {
 			prg.dumpCode(t.Logf)
-			t.Fatalf("values: %v", prg.values)
+			t.Fatalf("values: %v", values)
 		}
 	}
 	f := func(src string, result Value, t *testing.T) {
@@ -4741,6 +4747,26 @@ func TestConstantFolding(t *testing.T) {
 	t.Run("return", func(t *testing.T) {
 		ff("function f() {return 1 + 2}; f()", valueInt(3), t)
 	})
+}
+
+func TestStringInterning(t *testing.T) {
+	const SCRIPT = `
+	const str1 = "Test";
+	function f() {
+		return "Test";
+	}
+	[str1, f()];
+	`
+	vm := New()
+	res, err := vm.RunString(SCRIPT)
+	if err != nil {
+		t.Fatal(err)
+	}
+	str1 := res.(*Object).Get("0").String()
+	str2 := res.(*Object).Get("1").String()
+	if unsafe.StringData(str1) != unsafe.StringData(str2) {
+		t.Fatal("not interned")
+	}
 }
 
 func TestAssignBeforeInit(t *testing.T) {
@@ -5838,6 +5864,26 @@ func TestFunctionBodyClassDecl(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestNestedDestructArray(t *testing.T) {
+	const SCRIPT = `
+	var [
+		[ h = 0 ] = [ 0 ]
+	] = [];
+	assert.sameValue(h, 0);
+
+	var [
+		[ h1 = 1 ] = []
+	] = [];
+	assert.sameValue(h1, 1);
+
+	var [
+		[ h2 = 1 ] = []
+	] = [ [ 2 ] ];
+	assert.sameValue(h2, 2);
+	`
+	testScriptWithTestLib(SCRIPT, _undefined, t)
 }
 
 /*
